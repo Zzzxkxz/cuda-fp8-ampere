@@ -72,8 +72,9 @@ Extra context (not apples-to-apples for FP8-as-storage, but useful):
 - Torch matmul only (weights already decoded/cached as fp16): 1.829 ms/iter (75.14 TOPS), peak alloc 120.1 MiB
 
 Notes:
-- “Torch matmul only (weights already fp16)” is faster, but it assumes you keep fp16 weights resident, which loses FP8 VRAM savings.
-- Peak alloc above is per-call peak allocated bytes (not full model VRAM footprint).
+- “Naive Torch (decode FP8→fp16 each iter + `A @ B.T`)” is what a straightforward FP8-as-storage pipeline looks like if you rely on standard fp16 GEMM.
+- “Torch matmul only (weights already fp16)” is faster, but it assumes you keep fp16 weights resident (loses FP8 VRAM savings).
+- Peak alloc above is per-call peak allocated bytes; for “matmul only” it does not include the already-resident fp16 weights.
 
 ### Kernel benchmarks (FP8 weights → INT8 tensor cores)
 
