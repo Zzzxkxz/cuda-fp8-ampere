@@ -84,6 +84,11 @@ def main():
         action="store_true",
         help="Report peak CUDA allocated bytes for each path (single call)",
     )
+    ap.add_argument(
+        "--downcast_out_fp8",
+        action="store_true",
+        help="Also time a naive pipeline that downcasts the fp16 matmul output to FP8 (float8_e4m3fn) each iter",
+    )
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
@@ -122,17 +127,35 @@ def main():
     def naive_decode_once_matmul_only():
         _ = A @ B_fp16_cached.t()
 
+    def naive_decode_each_iter_matmul_downcast_out_fp8():
+        # Decode weights every iteration, fp16 matmul, then downcast output to FP8.
+        # This approximates a pipeline where you store an intermediate activation/output in FP8.
+        B_fp16 = torch.take(lut, B_u8.to(torch.int64).reshape(-1)).reshape(args.N, args.K)
+        B_fp16 = B_fp16 * scales[:, None]
+        out = A @ B_fp16.t()
+        _ = out.to(torch.float8_e4m3fn)
+
     # Timings
     ms_fused = cuda_time_ms(fused_once, args.iters, args.warmup)
     ms_naive_full = cuda_time_ms(naive_decode_each_iter, args.iters, args.warmup)
     ms_naive_matmul = cuda_time_ms(naive_decode_once_matmul_only, args.iters, args.warmup)
 
+    ms_naive_full_downcast = None
+    if args.downcast_out_fp8:
+        assert hasattr(torch, "float8_e4m3fn"), "This torch build lacks float8_e4m3fn"
+        ms_naive_full_downcast = cuda_time_ms(
+            naive_decode_each_iter_matmul_downcast_out_fp8, args.iters, args.warmup
+        )
+
     mem_fused = mem_naive_full = mem_naive_matmul = None
+    mem_naive_full_downcast = None
     if args.report_mem:
         # Use a single call to estimate peak allocation.
         mem_fused = peak_mem_bytes(fused_once)
         mem_naive_full = peak_mem_bytes(naive_decode_each_iter)
         mem_naive_matmul = peak_mem_bytes(naive_decode_once_matmul_only)
+        if ms_naive_full_downcast is not None:
+            mem_naive_full_downcast = peak_mem_bytes(naive_decode_each_iter_matmul_downcast_out_fp8)
 
     print("Sizes: M,N,K =", args.M, args.N, args.K)
     print("kChunk:", args.kChunk)
@@ -152,6 +175,14 @@ def main():
     print(f"  {ms_naive_matmul:.4f} ms/iter  ({tops_from_ms(ms_naive_matmul, args.M, args.N, args.K):.2f} TOPS)")
     if mem_naive_matmul is not None:
         print(f"  peak alloc: {mem_naive_matmul / (1024**2):.1f} MiB")
+
+    if ms_naive_full_downcast is not None:
+        print("NAIVE Torch (decode FP8->FP16 each iter + fp16 matmul + downcast output to FP8):")
+        print(
+            f"  {ms_naive_full_downcast:.4f} ms/iter  ({tops_from_ms(ms_naive_full_downcast, args.M, args.N, args.K):.2f} TOPS)"
+        )
+        if mem_naive_full_downcast is not None:
+            print(f"  peak alloc: {mem_naive_full_downcast / (1024**2):.1f} MiB")
 
 
 if __name__ == "__main__":
