@@ -81,15 +81,30 @@ Shape: $M=N=K=4096$, `--warmup 10 --iters 50`.
 | Benchmark | What it does | Time / iter | Throughput |
 |---|---|---:|---:|
 | `imma_fp8_jit_v2` | FP8(E4M3) bytes → FP16(LUT) → per-col scale → INT8 + IMMA | 2.714 ms | 50.63 TOPS |
+| `imma_fp8_jit_v2_l2pin` | `imma_fp8_jit_v2` + persisting-L2 hinting for B/scales | 2.744 ms | 50.09 TOPS |
 | `imma_fp8_jit_v4_act_f16` | FP16 activations, cp.async staging + INT8 quant + FP8→INT8 JIT + IMMA | 2.818 ms | 48.77 TOPS |
+| `imma_fp8_jit_v4_act_f16_l2pin` | `imma_fp8_jit_v4_act_f16` + persisting-L2 hinting for B/scales | 2.851 ms | 48.21 TOPS |
+| `imma_fp8_jit_v4_act_f16_texscale` | `imma_fp8_jit_v4_act_f16` but per-col scales loaded via TEX (u16) | 2.824 ms | 48.66 TOPS |
+| `imma_fp8_jit_v4_act_f16_texscale_l2pin` | `imma_fp8_jit_v4_act_f16_texscale` + persisting-L2 hinting | 2.854 ms | 48.16 TOPS |
 | `imma_fp8_jit_v2_i8lut` | FP8→INT8 via per-column shared LUT (experimental) + IMMA | 3.369 ms | 40.79 TOPS |
+| `imma_fp8_jit_v3_act_f16` | FP16 A → INT8 (fused) + FP8→INT8 JIT + IMMA (register path) | 5.606 ms | 24.52 TOPS |
+| `int8gemm` | cuBLASLt INT8×INT8→INT32 tensor-core baseline (not FP8-as-storage) | 0.018 ms | 118.06 TOPS |
+
+Notes:
+- `*_l2pin` results can vary with driver/GPU state and other workloads.
 
 Commands:
 
 ```bash
 ./build/gpu_bench --bench imma_fp8_jit_v2 --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v2_l2pin --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
 ./build/gpu_bench --bench imma_fp8_jit_v4_act_f16 --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v4_act_f16_l2pin --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v4_act_f16_texscale --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v4_act_f16_texscale_l2pin --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
 ./build/gpu_bench --bench imma_fp8_jit_v2_i8lut --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v3_act_f16 --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench int8gemm --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
 ```
 
 ## Build
