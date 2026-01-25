@@ -72,6 +72,26 @@ Notes:
 - “Torch matmul only (weights already fp16)” is faster, but it assumes you keep fp16 weights resident, which loses FP8 VRAM savings.
 - Peak alloc above is per-call peak allocated bytes (not full model VRAM footprint).
 
+### Kernel benchmarks (FP8 weights → INT8 tensor cores)
+
+Measured via `./build/gpu_bench` on RTX 3090 Ti (sm_86), driver 590.48.01, CUDA 13.1.
+
+Shape: $M=N=K=4096$, `--warmup 10 --iters 50`.
+
+| Benchmark | What it does | Time / iter | Throughput |
+|---|---|---:|---:|
+| `imma_fp8_jit_v2` | FP8(E4M3) bytes → FP16(LUT) → per-col scale → INT8 + IMMA | 2.714 ms | 50.63 TOPS |
+| `imma_fp8_jit_v4_act_f16` | FP16 activations, cp.async staging + INT8 quant + FP8→INT8 JIT + IMMA | 2.818 ms | 48.77 TOPS |
+| `imma_fp8_jit_v2_i8lut` | FP8→INT8 via per-column shared LUT (experimental) + IMMA | 3.369 ms | 40.79 TOPS |
+
+Commands:
+
+```bash
+./build/gpu_bench --bench imma_fp8_jit_v2 --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v4_act_f16 --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+./build/gpu_bench --bench imma_fp8_jit_v2_i8lut --M 4096 --N 4096 --K 4096 --warmup 10 --iters 50
+```
+
 ## Build
 
 If you cloned this repo fresh, initialize submodules first (CUTLASS):
