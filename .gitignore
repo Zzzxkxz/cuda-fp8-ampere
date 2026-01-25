@@ -1,0 +1,36 @@
+# Build outputs
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Python
+.venv*/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.dist/
+.dist-info/
+
+# Profiling artifacts (large/binary)
+**/*.ncu-rep
+**/*.nsys-rep
+
+# Local logs / traces
+*.log
+
+# Telemetry dumps
+stability_*_telem.csv
+
+
+
+
+# Editor
+.vscode/
+
+# OS
+.DS_Store
