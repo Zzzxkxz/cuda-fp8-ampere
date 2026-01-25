@@ -26,9 +26,6 @@ __pycache__/
 # Telemetry dumps
 stability_*_telem.csv
 
-
-
-
 # Editor
 .vscode/
 
