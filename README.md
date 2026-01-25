@@ -74,6 +74,12 @@ Notes:
 
 ## Build
 
+If you cloned this repo fresh, initialize submodules first (CUTLASS):
+
+```bash
+git submodule update --init --recursive
+```
+
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
