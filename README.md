@@ -65,8 +65,11 @@ torch_ext/fp8imma              Minimal PyTorch extension (links libfp8imma.so)
 These are **microbenchmarks** on RTX 3090 Ti, CUDA visible, using the included scripts.
 
 Apples-to-apples FP8-storage baseline comparison (M=N=K=4096, fp16 activations, FP8 bytes weights):
-- Fused `fp8imma_ext.imma_fp8_v4_act`: ~2.95 ms/iter (~46.6 TOPS), peak alloc ~120 MiB
-- Naive Torch (decode FP8→fp16 each iter + `A @ B.T`): ~2.43 ms/iter (~56.6 TOPS), peak alloc ~248 MiB
+- Fused `fp8imma_ext.imma_fp8_v4_act`: 2.869 ms/iter (47.90 TOPS), peak alloc 120.1 MiB
+- Naive Torch (decode FP8→fp16 each iter + `A @ B.T`): 2.269 ms/iter (60.58 TOPS), peak alloc 248.1 MiB
+
+Extra context (not apples-to-apples for FP8-as-storage, but useful):
+- Torch matmul only (weights already decoded/cached as fp16): 1.829 ms/iter (75.14 TOPS), peak alloc 120.1 MiB
 
 Notes:
 - “Torch matmul only (weights already fp16)” is faster, but it assumes you keep fp16 weights resident, which loses FP8 VRAM savings.
