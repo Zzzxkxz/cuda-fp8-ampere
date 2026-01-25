@@ -1,3 +1,6 @@
+// Legacy monolithic translation unit (kept for archaeology).
+// The fp8imma library is now built from modular sources in src/fp8imma/*.cu.
+
 #include "fp8imma/imma_fp8.h"
 
 #include <cmath>

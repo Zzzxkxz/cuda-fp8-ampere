@@ -35,5 +35,4 @@ stability_*_telem.csv
 # OS
 .DS_Store
 
-# Third-party vendored
-third_party/cutlass/
+# CUTLASS is tracked as a git submodule under third_party/cutlass/

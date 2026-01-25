@@ -1,3 +1,6 @@
+// Legacy monolith kept for archaeology.
+// The benchmark binary now builds from src/gpu_bench.cu, which includes modules in src/bench/.
+
 #include <cuda_runtime.h>
 
 #include <cstdint>

@@ -6,7 +6,7 @@ Goal: keep weights stored as **1-byte FP8(E4M3) bits** in VRAM, decode + per-col
 
 This repo contains:
 - a reusable CUDA kernel library (C++ API + C ABI): `include/fp8imma/imma_fp8.h`
-- a benchmark harness: `src/main.cu` → `build/gpu_bench`
+- a benchmark harness: `src/gpu_bench.cu` → `build/gpu_bench`
 - a minimal PyTorch extension: `torch_ext/fp8imma`
 
 Large exploratory markdown notes were moved into `reports/` and are git-ignored.
@@ -22,6 +22,43 @@ Kernel variants exposed by the library include:
 - v2: int8 activations + FP8 weights (JIT FP8→int8)
 - v3: fused activation quantization (register path)
 - v4: pipelined activations + fused quantization (shared staging)
+
+### Kernel dataflow (FP8-as-storage)
+
+```text
+	A (fp16/bf16)                B (uint8 fp8-e4m3 bits)         col_scales (u16 bits)
+   [M,K] row-major               [N,K] (represents KxN col-major)      [N]
+		  |                               |                               |
+		  |                               | (LUT in __constant__)        |
+		  |                               v                               |
+		  |                        fp8 -> fp16 decode                     |
+		  |                               |                               |
+		  |                               +-----------(per-column)--------+
+		  |                                           scale
+		  |                               |
+		  |                               v
+		  |                        fp16 -> int8 (sat)
+		  |                               |
+		  +--------------- int8 A --------+
+						  (act quant)
+										  |
+										  v
+								WMMA/IMMA (int8) accumulate (int32)
+										  |
+										  v
+								 D (fp16) written as [N,M]
+								 (represents MxN col-major)
+```
+
+Code organization:
+
+```text
+include/fp8imma/imma_fp8.h      Public C++ API + C ABI entry points
+src/fp8imma/*.cu               Modular kernel implementations + wrappers
+src/fp8imma/impl/*.inl         Per-variant kernel bodies
+src/gpu_bench.cu + src/bench/* Benchmark harness
+torch_ext/fp8imma              Minimal PyTorch extension (links libfp8imma.so)
+```
 
 ## Results (measured locally)
 
@@ -40,6 +77,28 @@ Notes:
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
+```
+
+## Tests
+
+From the build directory:
+
+```bash
+ctest --output-on-failure
+```
+
+PyTorch extension smoke-test (builds + imports + runs one tiny CUDA call):
+
+```bash
+ctest -R torch --output-on-failure
+```
+
+If you don’t have PyTorch installed (or no CUDA device is available), the torch test prints `SKIP:` and exits successfully.
+
+To disable adding torch tests at configure-time:
+
+```bash
+cmake .. -DFP8IMMA_ENABLE_TORCH_TESTS=OFF
 ```
 
 ## Run
